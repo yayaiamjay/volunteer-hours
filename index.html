@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>臺南市歷史館｜志工值勤時數查詢</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --site-primary:#23576B;
+  --site-on-primary:#FFFFFF;
+  --site-secondary:#E6F1F1;
+  --site-on-secondary:#24424D;
+  --site-background:#F5F7F7;
+  --site-on-background:#20353E;
+  --site-font-body:system-ui,"Noto Sans TC",sans-serif;
+  --site-font-heading:system-ui,"Noto Sans TC",sans-serif;
+  --site-heading-scale:1;
+  --site-spacing-scale:1;
+  --site-radius-scale:1;
+  --site-decoration-opacity:1;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--site-font-body)}
+#app{min-height:100vh;background-color:light-dark(var(--site-background),#15252C);color:light-dark(var(--site-on-background),#EAF1F3);border-radius:0;padding:calc(42px * var(--site-spacing-scale)) 20px 64px}
+main{max-width:760px;margin:auto}
+.eyebrow{font-size:13px;letter-spacing:.12em;font-weight:700;color:light-dark(#527987,#A9C5CF)}
+h1{font-family:var(--site-font-heading);font-size:calc(31px * var(--site-heading-scale));margin:12px 0 8px;line-height:1.35}
+.intro{line-height:1.8;color:light-dark(#60737A,#B8C7CC);margin:0 0 30px}
+.panel{background:light-dark(#FFFFFF,#21343C);border:1px solid light-dark(#DDE6E8,#38505B);border-radius:calc(16px * var(--site-radius-scale));padding:calc(26px * var(--site-spacing-scale));box-shadow:0 8px 24px #152F3710}
+label{display:block;font-weight:700;margin-bottom:12px}
+.form{display:flex;gap:10px}
+input{min-width:0;flex:1;padding:14px 15px;font:inherit;border:1px solid light-dark(#C4D3D8,#68808A);border-radius:calc(9px * var(--site-radius-scale));background:light-dark(#FFFFFF,#182A32);color:inherit;outline-offset:3px}
+button{border:0;background:var(--site-primary);color:var(--site-on-primary);font:inherit;font-weight:700;border-radius:calc(9px * var(--site-radius-scale));padding:12px 25px;cursor:pointer}
+button:hover{filter:brightness(1.12)}
+.hint{font-size:13px;color:light-dark(#708087,#B8C7CC);margin:13px 0 0}
+#result{margin-top:22px}
+.result-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:19px}
+.result-head h2{font-size:calc(22px * var(--site-heading-scale));margin:0}
+.year{font-size:13px;color:light-dark(#708087,#B8C7CC)}
+table{width:100%;border-collapse:collapse;text-align:center}
+th{font-size:13px;font-weight:700;background:light-dark(var(--site-secondary),#304C58);color:light-dark(var(--site-on-secondary),#EAF4F5)}
+th,td{padding:15px 8px;border-bottom:1px solid light-dark(#E1E9EB,#3D5660)}
+td{font-size:18px;font-variant-numeric:tabular-nums}
+.total{margin-top:20px;border-radius:calc(12px * var(--site-radius-scale));padding:19px 22px;background:var(--site-primary);color:var(--site-on-primary);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.total strong{font-size:28px}
+.error{color:light-dark(#A53C37,#FFB4AB);font-weight:600}
+footer{font-size:12px;color:light-dark(#819095,#A9BDC5);text-align:center;margin-top:35px;line-height:1.8}
+@media(max-width:520px){#app{padding:30px 15px 50px}h1{font-size:calc(25px * var(--site-heading-scale))}.panel{padding:18px}.form{flex-direction:column}button{width:100%}th,td{padding:13px 3px}th{font-size:11px}td{font-size:15px}}
+</style>
+</head>
+<body>
+<div id="app">
+<main>
+<div class="eyebrow">TAINAN CITY MUSEUM · VOLUNTEER SERVICE</div>
+<h1>臺南市歷史館<br>志工值勤時數查詢</h1>
+<p class="intro">輸入您的姓名，即可查詢民國115年度各季值勤時數與全年累計時數。</p>
+<section class="panel">
+<label for="name">志工姓名</label>
+<form class="form" id="searchForm">
+<input id="name" type="text" autocomplete="off" placeholder="請輸入完整姓名" required>
+<button type="submit">查詢時數</button>
+</form>
+<p class="hint">請輸入登記於志工名冊上的完整姓名。資料統計至原始檔案記錄日期。</p>
+<div id="result" aria-live="polite" hidden></div>
+</section>
+<footer>臺南市歷史館 · 115年度志工值勤時數<br>本頁為查詢用靜態資料版本，後續異動須重新更新資料。</footer>
+</main>
+</div>
+<script>
+const volunteers=[{"name": "黃有弟", "hours": [91.5, 92, 176, 44, 403.5]}, {"name": "徐娟娟", "hours": [76, 116, 184, 16, 392]}, {"name": "郭芳芳", "hours": [84, 80, 112, 44, 320]}, {"name": "陳重鳴", "hours": [52, 68, 144, 32, 296]}, {"name": "蕭素卿", "hours": [52, 56, 96, 24, 228]}, {"name": "蕭素珍", "hours": [56, 48, 92, 24, 220]}, {"name": "陳碧雲", "hours": [73, 56, 44, 16, 189]}, {"name": "陳淑惠", "hours": [72, 32, 44, 16, 164]}, {"name": "王致仁", "hours": [40, 40, 64, 12, 156]}, {"name": "邱淑惠", "hours": [44, 32, 72, 8, 156]}, {"name": "張素美", "hours": [44, 32, 56, 16, 148]}, {"name": "彭彰春", "hours": [44, 48, 44, 12, 148]}, {"name": "杜淑英", "hours": [44, 40, 44, 16, 144]}, {"name": "李麗珠", "hours": [32, 40, 56, 12, 140]}, {"name": "王素蓮", "hours": [48, 36, 44, 8, 136]}, {"name": "李麗珠(兒)", "hours": [24, 48, 52, 8, 132]}, {"name": "陳忠仁", "hours": [28, 32, 60, 12, 132]}, {"name": "林台昌", "hours": [36, 24, 56, 12, 128]}, {"name": "張吉成", "hours": [40, 28, 44, 16, 128]}, {"name": "陳泓志", "hours": [53, 12, 52, 8, 125]}, {"name": "林絨", "hours": [32, 24, 56, 12, 124]}, {"name": "林瑞和", "hours": [32, 32, 48, 12, 124]}, {"name": "邱惠麗", "hours": [28, 28, 52, 16, 124]}, {"name": "紀慧娟", "hours": [36, 32, 44, 12, 124]}, {"name": "陳麗珠", "hours": [36, 32, 40, 16, 124]}, {"name": "戴廷峻", "hours": [36, 32, 44, 12, 124]}, {"name": "葉瑞邦", "hours": [32, 32, 48, 10, 122]}, {"name": "吳淑鳳", "hours": [40, 24, 48, 8, 120]}, {"name": "蔡肅", "hours": [32, 28, 48, 12, 120]}, {"name": "梁宏煌", "hours": [32, 32, 44, 12, 120]}, {"name": "林素雲", "hours": [28, 28, 51.5, 12, 119.5]}, {"name": "郤詩園", "hours": [32, 24, 48, 12, 116]}, {"name": "許美鳳", "hours": [32, 32, 36, 16, 116]}, {"name": "張麗琦", "hours": [37, 24, 40, 12, 113]}, {"name": "林錦蓮", "hours": [28, 28, 48, 8, 112]}, {"name": "莊鏡生", "hours": [48, 16, 40, 8, 112]}, {"name": "陳雪卿", "hours": [28, 24, 52, 8, 112]}, {"name": "蔡佩蓉", "hours": [28, 28, 44, 12, 112]}, {"name": "王勝忠", "hours": [32, 16, 48, 12, 108]}, {"name": "林素珍", "hours": [28, 24, 44, 12, 108]}, {"name": "陳秀寶", "hours": [16, 28, 52, 12, 108]}, {"name": "楊時貴", "hours": [24, 28, 48, 8, 108]}, {"name": "邱瑞榮", "hours": [36, 24, 32, 8, 100]}, {"name": "張文珠", "hours": [44, 24, 28, 4, 100]}, {"name": "黃佳麟", "hours": [28, 20, 40, 12, 100]}, {"name": "孫中平", "hours": [24, 16, 36, 20, 96]}, {"name": "陳彥旭", "hours": [28, 20, 40, 8, 96]}, {"name": "陳顯良", "hours": [28, 15, 44, 8, 95]}, {"name": "許淑娟", "hours": [28, 16, 36, 12, 92]}, {"name": "廖雅玲", "hours": [28, 24, 36, 4, 92]}, {"name": "盧燕促", "hours": [24, 24, 36, 8, 92]}, {"name": "吳惠萍", "hours": [26, 19, 42, 4, 91]}, {"name": "顏正鴻", "hours": [29, 28, 23.5, 8, 88.5]}, {"name": "柯麗英", "hours": [24, 20, 40, 4, 88]}, {"name": "莊富敏", "hours": [24, 24, 40, 0, 88]}, {"name": "陳淑惠(兒)", "hours": [24, 24, 32, 8, 88]}, {"name": "陳寳淑", "hours": [16, 20, 44, 8, 88]}, {"name": "廖容萱", "hours": [40, 20, 28, 0, 88]}, {"name": "李枝穎", "hours": [36, 24, 19, 8, 87]}, {"name": "陳幼娟", "hours": [28, 20, 32, 7, 87]}, {"name": "莊珮雯", "hours": [28, 16, 36, 4, 84]}, {"name": "蔡慧玉", "hours": [20, 24, 21.5, 12, 77.5]}, {"name": "沈佳勳", "hours": [20, 20, 28, 8, 76]}, {"name": "施淑", "hours": [16, 16, 36, 8, 76]}, {"name": "徐文秀", "hours": [12, 28, 28, 8, 76]}, {"name": "陳孋娥", "hours": [12, 24, 40, 0, 76]}, {"name": "杜宜昌", "hours": [24, 24, 24, 0, 72]}, {"name": "陳淑娟", "hours": [24, 16, 20, 12, 72]}, {"name": "黃瑞德", "hours": [36, 28, 8, 0, 72]}, {"name": "羅偉豪", "hours": [24, 20, 19, 8, 71]}, {"name": "吳佳樺", "hours": [20, 24, 24, 0, 68]}, {"name": "徐憲政", "hours": [0, 24, 32, 8, 64]}, {"name": "陳惠玉", "hours": [24, 20, 12, 8, 64]}, {"name": "施鳳蘭", "hours": [20, 16, 16, 8, 60]}, {"name": "許容", "hours": [8, 20, 16, 8, 52]}, {"name": "梁郁萍", "hours": [9, 0, 12, 8, 29]}, {"name": "沈溫厚", "hours": [24, 0, 0, 0, 24]}, {"name": "黃雪芬", "hours": [12, 0, 0, 4, 16]}, {"name": "鄧艾玲", "hours": [16, 0, 0, 0, 16]}];
+const form=document.getElementById("searchForm");
+const input=document.getElementById("name");
+const result=document.getElementById("result");
+function clean(v){return v.normalize("NFKC").replace(/\s+/g,"").trim();}
+function fmt(v){return Number(v).toLocaleString("zh-TW",{maximumFractionDigits:2});}
+form.addEventListener("submit",event=>{
+  event.preventDefault();
+  const query=clean(input.value);
+  result.hidden=false;
+  result.replaceChildren();
+  const matches=volunteers.filter(v=>clean(v.name)===query);
+  if(!matches.length){
+    const p=document.createElement("p");
+    p.className="error";
+    p.textContent="查無此姓名的志工資料，請確認姓名是否輸入正確。";
+    result.appendChild(p);
+    return;
+  }
+  if(matches.length>1){
+    const p=document.createElement("p");
+    p.className="error";
+    p.textContent="名冊中有同名志工，無法單憑姓名確認身分，請洽管理人員。";
+    result.appendChild(p);
+    return;
+  }
+  const v=matches[0];
+  const section=document.createElement("section");
+  const head=document.createElement("div");
+  head.className="result-head";
+  const h=document.createElement("h2");h.textContent=v.name+" 的值勤紀錄";
+  const year=document.createElement("span");year.className="year";year.textContent="民國115年度";
+  head.append(h,year);
+  const table=document.createElement("table");
+  const trh=document.createElement("tr");
+  ["1~3月","4~6月","7~9月","10~12月"].forEach(label=>{
+    const th=document.createElement("th");th.scope="col";th.textContent=label;trh.appendChild(th);
+  });
+  const tr=document.createElement("tr");
+  v.hours.slice(0,4).forEach(n=>{const td=document.createElement("td");td.textContent=fmt(n);tr.appendChild(td);});
+  const thead=document.createElement("thead");thead.appendChild(trh);
+  const tbody=document.createElement("tbody");tbody.appendChild(tr);
+  table.append(thead,tbody);
+  const total=document.createElement("div");total.className="total";
+  const title=document.createElement("span");title.textContent="TOTAL · 累計總時數";
+  const amount=document.createElement("strong");amount.textContent=fmt(v.hours[4])+" 小時";
+  total.append(title,amount);
+  section.append(head,table,total);
+  result.appendChild(section);
+});
+</script>
+</body>
+</html>
