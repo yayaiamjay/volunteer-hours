@@ -61,62 +61,112 @@ footer{font-size:12px;color:light-dark(#819095,#A9BDC5);text-align:center;margin
 <input id="name" type="text" autocomplete="off" placeholder="請輸入完整姓名" required>
 <button type="submit">查詢時數</button>
 </form>
-<p class="hint">請輸入登記於志工名冊上的完整姓名。資料統計至原始檔案記錄日期。</p>
+<p class="hint">請輸入登記於志工名冊上的完整姓名。資料依館方線上試算表最新登錄內容顯示。</p>
 <div id="result" aria-live="polite" hidden></div>
 </section>
-<footer>臺南市歷史館 · 115年度志工值勤時數<br>本頁為查詢用靜態資料版本，後續異動須重新更新資料。</footer>
+<footer>臺南市歷史館 · 115年度志工值勤時數<br>本頁查詢資料由館方線上時數表提供。</footer>
 </main>
 </div>
 <script>
-const volunteers=[{"name": "黃有弟", "hours": [91.5, 92, 176, 44, 403.5]}, {"name": "徐娟娟", "hours": [76, 116, 184, 16, 392]}, {"name": "郭芳芳", "hours": [84, 80, 112, 44, 320]}, {"name": "陳重鳴", "hours": [52, 68, 144, 32, 296]}, {"name": "蕭素卿", "hours": [52, 56, 96, 24, 228]}, {"name": "蕭素珍", "hours": [56, 48, 92, 24, 220]}, {"name": "陳碧雲", "hours": [73, 56, 44, 16, 189]}, {"name": "陳淑惠", "hours": [72, 32, 44, 16, 164]}, {"name": "王致仁", "hours": [40, 40, 64, 12, 156]}, {"name": "邱淑惠", "hours": [44, 32, 72, 8, 156]}, {"name": "張素美", "hours": [44, 32, 56, 16, 148]}, {"name": "彭彰春", "hours": [44, 48, 44, 12, 148]}, {"name": "杜淑英", "hours": [44, 40, 44, 16, 144]}, {"name": "李麗珠", "hours": [32, 40, 56, 12, 140]}, {"name": "王素蓮", "hours": [48, 36, 44, 8, 136]}, {"name": "李麗珠(兒)", "hours": [24, 48, 52, 8, 132]}, {"name": "陳忠仁", "hours": [28, 32, 60, 12, 132]}, {"name": "林台昌", "hours": [36, 24, 56, 12, 128]}, {"name": "張吉成", "hours": [40, 28, 44, 16, 128]}, {"name": "陳泓志", "hours": [53, 12, 52, 8, 125]}, {"name": "林絨", "hours": [32, 24, 56, 12, 124]}, {"name": "林瑞和", "hours": [32, 32, 48, 12, 124]}, {"name": "邱惠麗", "hours": [28, 28, 52, 16, 124]}, {"name": "紀慧娟", "hours": [36, 32, 44, 12, 124]}, {"name": "陳麗珠", "hours": [36, 32, 40, 16, 124]}, {"name": "戴廷峻", "hours": [36, 32, 44, 12, 124]}, {"name": "葉瑞邦", "hours": [32, 32, 48, 10, 122]}, {"name": "吳淑鳳", "hours": [40, 24, 48, 8, 120]}, {"name": "蔡肅", "hours": [32, 28, 48, 12, 120]}, {"name": "梁宏煌", "hours": [32, 32, 44, 12, 120]}, {"name": "林素雲", "hours": [28, 28, 51.5, 12, 119.5]}, {"name": "郤詩園", "hours": [32, 24, 48, 12, 116]}, {"name": "許美鳳", "hours": [32, 32, 36, 16, 116]}, {"name": "張麗琦", "hours": [37, 24, 40, 12, 113]}, {"name": "林錦蓮", "hours": [28, 28, 48, 8, 112]}, {"name": "莊鏡生", "hours": [48, 16, 40, 8, 112]}, {"name": "陳雪卿", "hours": [28, 24, 52, 8, 112]}, {"name": "蔡佩蓉", "hours": [28, 28, 44, 12, 112]}, {"name": "王勝忠", "hours": [32, 16, 48, 12, 108]}, {"name": "林素珍", "hours": [28, 24, 44, 12, 108]}, {"name": "陳秀寶", "hours": [16, 28, 52, 12, 108]}, {"name": "楊時貴", "hours": [24, 28, 48, 8, 108]}, {"name": "邱瑞榮", "hours": [36, 24, 32, 8, 100]}, {"name": "張文珠", "hours": [44, 24, 28, 4, 100]}, {"name": "黃佳麟", "hours": [28, 20, 40, 12, 100]}, {"name": "孫中平", "hours": [24, 16, 36, 20, 96]}, {"name": "陳彥旭", "hours": [28, 20, 40, 8, 96]}, {"name": "陳顯良", "hours": [28, 15, 44, 8, 95]}, {"name": "許淑娟", "hours": [28, 16, 36, 12, 92]}, {"name": "廖雅玲", "hours": [28, 24, 36, 4, 92]}, {"name": "盧燕促", "hours": [24, 24, 36, 8, 92]}, {"name": "吳惠萍", "hours": [26, 19, 42, 4, 91]}, {"name": "顏正鴻", "hours": [29, 28, 23.5, 8, 88.5]}, {"name": "柯麗英", "hours": [24, 20, 40, 4, 88]}, {"name": "莊富敏", "hours": [24, 24, 40, 0, 88]}, {"name": "陳淑惠(兒)", "hours": [24, 24, 32, 8, 88]}, {"name": "陳寳淑", "hours": [16, 20, 44, 8, 88]}, {"name": "廖容萱", "hours": [40, 20, 28, 0, 88]}, {"name": "李枝穎", "hours": [36, 24, 19, 8, 87]}, {"name": "陳幼娟", "hours": [28, 20, 32, 7, 87]}, {"name": "莊珮雯", "hours": [28, 16, 36, 4, 84]}, {"name": "蔡慧玉", "hours": [20, 24, 21.5, 12, 77.5]}, {"name": "沈佳勳", "hours": [20, 20, 28, 8, 76]}, {"name": "施淑", "hours": [16, 16, 36, 8, 76]}, {"name": "徐文秀", "hours": [12, 28, 28, 8, 76]}, {"name": "陳孋娥", "hours": [12, 24, 40, 0, 76]}, {"name": "杜宜昌", "hours": [24, 24, 24, 0, 72]}, {"name": "陳淑娟", "hours": [24, 16, 20, 12, 72]}, {"name": "黃瑞德", "hours": [36, 28, 8, 0, 72]}, {"name": "羅偉豪", "hours": [24, 20, 19, 8, 71]}, {"name": "吳佳樺", "hours": [20, 24, 24, 0, 68]}, {"name": "徐憲政", "hours": [0, 24, 32, 8, 64]}, {"name": "陳惠玉", "hours": [24, 20, 12, 8, 64]}, {"name": "施鳳蘭", "hours": [20, 16, 16, 8, 60]}, {"name": "許容", "hours": [8, 20, 16, 8, 52]}, {"name": "梁郁萍", "hours": [9, 0, 12, 8, 29]}, {"name": "沈溫厚", "hours": [24, 0, 0, 0, 24]}, {"name": "黃雪芬", "hours": [12, 0, 0, 4, 16]}, {"name": "鄧艾玲", "hours": [16, 0, 0, 0, 16]}];
-const form=document.getElementById("searchForm");
-const input=document.getElementById("name");
-const result=document.getElementById("result");
-function clean(v){return v.normalize("NFKC").replace(/\s+/g,"").trim();}
-function fmt(v){return Number(v).toLocaleString("zh-TW",{maximumFractionDigits:2});}
-form.addEventListener("submit",event=>{
-  event.preventDefault();
-  const query=clean(input.value);
-  result.hidden=false;
+const API_URL = 'https://script.google.com/macros/s/AKfycbx2p16q5Si3kQu2gHyPl4-ekDm0puGZDR2n5fjlu7ImYzm5J8rNIdCiu54NJmFBAa9D4Q/exec';
+const form = document.getElementById('searchForm');
+const input = document.getElementById('name');
+const result = document.getElementById('result');
+const submitButton = form.querySelector('button');
+let requestNumber = 0;
+function fmt(v) { return Number(v).toLocaleString('zh-TW', { maximumFractionDigits: 2 }); }
+function showMessage(message) {
   result.replaceChildren();
-  const matches=volunteers.filter(v=>clean(v.name)===query);
-  if(!matches.length){
-    const p=document.createElement("p");
-    p.className="error";
-    p.textContent="查無此姓名的志工資料，請確認姓名是否輸入正確。";
-    result.appendChild(p);
-    return;
-  }
-  if(matches.length>1){
-    const p=document.createElement("p");
-    p.className="error";
-    p.textContent="名冊中有同名志工，無法單憑姓名確認身分，請洽管理人員。";
-    result.appendChild(p);
-    return;
-  }
-  const v=matches[0];
-  const section=document.createElement("section");
-  const head=document.createElement("div");
-  head.className="result-head";
-  const h=document.createElement("h2");h.textContent=v.name+" 的值勤紀錄";
-  const year=document.createElement("span");year.className="year";year.textContent="民國115年度";
-  head.append(h,year);
-  const table=document.createElement("table");
-  const trh=document.createElement("tr");
-  ["1~3月","4~6月","7~9月","10~12月"].forEach(label=>{
-    const th=document.createElement("th");th.scope="col";th.textContent=label;trh.appendChild(th);
+  const p = document.createElement('p');
+  p.className = 'error';
+  p.textContent = message;
+  result.appendChild(p);
+}
+function showHours(data) {
+  result.replaceChildren();
+  const section = document.createElement('section');
+  const head = document.createElement('div');
+  head.className = 'result-head';
+  const h = document.createElement('h2');
+  h.textContent = data.name + ' 的值勤紀錄';
+  const year = document.createElement('span');
+  year.className = 'year';
+  year.textContent = '民國115年度';
+  head.append(h, year);
+  const table = document.createElement('table');
+  const trh = document.createElement('tr');
+  ['1~3月','4~6月','7~9月','10~12月'].forEach(label => {
+    const th = document.createElement('th');
+    th.scope = 'col';
+    th.textContent = label;
+    trh.appendChild(th);
   });
-  const tr=document.createElement("tr");
-  v.hours.slice(0,4).forEach(n=>{const td=document.createElement("td");td.textContent=fmt(n);tr.appendChild(td);});
-  const thead=document.createElement("thead");thead.appendChild(trh);
-  const tbody=document.createElement("tbody");tbody.appendChild(tr);
-  table.append(thead,tbody);
-  const total=document.createElement("div");total.className="total";
-  const title=document.createElement("span");title.textContent="TOTAL · 累計總時數";
-  const amount=document.createElement("strong");amount.textContent=fmt(v.hours[4])+" 小時";
-  total.append(title,amount);
-  section.append(head,table,total);
+  const tr = document.createElement('tr');
+  [data.quarters.q1,data.quarters.q2,data.quarters.q3,data.quarters.q4].forEach(value => {
+    const td = document.createElement('td');
+    td.textContent = fmt(value);
+    tr.appendChild(td);
+  });
+  const thead = document.createElement('thead');
+  thead.appendChild(trh);
+  const tbody = document.createElement('tbody');
+  tbody.appendChild(tr);
+  table.append(thead, tbody);
+  const total = document.createElement('div');
+  total.className = 'total';
+  const title = document.createElement('span');
+  title.textContent = 'TOTAL · 累計總時數';
+  const amount = document.createElement('strong');
+  amount.textContent = fmt(data.total) + ' 小時';
+  total.append(title, amount);
+  section.append(head, table, total);
   result.appendChild(section);
+}
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  const name = input.value.trim();
+  if (!name) return;
+  const current = ++requestNumber;
+  result.hidden = false;
+  result.replaceChildren();
+  const loading = document.createElement('p');
+  loading.textContent = '正在讀取最新時數，請稍候…';
+  result.appendChild(loading);
+  submitButton.disabled = true;
+  const callbackName = 'volunteerCallback_' + current + '_' + Date.now();
+  const script = document.createElement('script');
+  let finished = false;
+  let timeoutId;
+  function cleanup() {
+    if (finished) return false;
+    finished = true;
+    clearTimeout(timeoutId);
+    script.remove();
+    // Keep a harmless callback temporarily for any delayed response.
+    window[callbackName] = function() {};
+    setTimeout(() => { delete window[callbackName]; }, 60000);
+    if (current === requestNumber) submitButton.disabled = false;
+    return true;
+  }
+  window[callbackName] = data => {
+    if (!cleanup() || current !== requestNumber) return;
+    if (!data || !data.success) {
+      showMessage((data && data.message) || '查詢失敗，請稍後再試。');
+      return;
+    }
+    showHours(data);
+  };
+  script.onerror = () => {
+    if (!cleanup() || current !== requestNumber) return;
+    showMessage('目前無法連接線上時數表，請稍後再試，或聯繫館方。');
+  };
+  timeoutId = setTimeout(() => {
+    if (!cleanup() || current !== requestNumber) return;
+    showMessage('查詢逾時，請稍後重試。');
+  }, 15000);
+  const params = new URLSearchParams({ name, callback: callbackName, _: String(Date.now()) });
+  script.src = API_URL + '?' + params.toString();
+  document.head.appendChild(script);
 });
 </script>
 </body>
